@@ -1,0 +1,23 @@
+// Themes
+// - themes go on body class: <body class="theme-default">
+
+@default-bg: #222;
+@default-dark: #111111;
+@default-logo: #fd2d5e;
+@default-blue: #2390c8;
+@default-gold: #f3c921;
+@default-inactive: #4a4a4a;
+.theme-ponie-dark, .theme-default {
+  background:@default-bg;
+  color:#fff;
+
+  .ponie-logo  {color:@default-logo;}
+  .ponie-db {color:@default-blue;}
+  .ponie-user {color:@default-gold;}
+  nav {background:@default-dark;}
+  .apps a  {
+    color:@default-inactive;
+    &.active {color:#fff;}
+  }
+
+}

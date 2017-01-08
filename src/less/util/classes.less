@@ -1,0 +1,22 @@
+.clearfix {
+	&::after {
+    display: block;
+    content: "";
+    clear: both;
+  }
+}
+.center-v {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.no-select {
+	cursor:default;
+	-webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;          /* Likely future */
+}
+.inline-block {
+  display:inline-block;
+}
