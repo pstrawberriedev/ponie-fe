@@ -2,15 +2,23 @@
 // - themes go on body class: <body class="theme-default">
 
 @default-bg: #222;
+@default-light: #fafafa;
 @default-dark: #111111;
+@default-dark2: #161616;
+
 @default-logo: #fd2d5e;
 @default-blue: #2390c8;
 @default-gold: #f3c921;
+
+@default-meta: #aaa;
 @default-inactive: #4a4a4a;
+
 .theme-ponie-dark, .theme-default {
+  // Theme base
   background:@default-bg;
   color:#fff;
 
+  // Theme nav
   .ponie-logo  {color:@default-logo;}
   .ponie-db {color:@default-blue;}
   .ponie-user {color:@default-gold;}
@@ -18,6 +26,24 @@
   .apps a  {
     color:@default-inactive;
     &.active {color:#fff;}
+  }
+
+  // Theme apps
+  .app-title {
+    color:#fff;
+  }
+  select[name=app-sources] {
+    color:@default-meta;
+  }
+
+  // Theme news
+  .news-item  {
+    color:@default-light;
+    border-color:@default-dark2;
+    height:200px;
+    background:rgba(255,255,255,.1);//delete me
+    padding-top:.65rem;
+    h2 {.font-body;}
   }
 
 }
