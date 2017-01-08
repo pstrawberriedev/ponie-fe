@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var watch = require('gulp-watch');
+var clean = require('gulp-clean');
 var babel = require('gulp-babel');
 var less = require('gulp-less');
 var cssmin = require('gulp-cssmin');
@@ -8,7 +9,19 @@ var uglify = require('gulp-uglify');
 var plumber = require('gulp-plumber');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
-var livereload = require('gulp-livereload');
+var runSequence = require('run-sequence');
+
+// Clean
+gulp.task('clean', function(){
+  return gulp.src(['./dist/*'], {read:false})
+  .pipe(clean());
+});
+
+// Move Static Files
+gulp.task('copy', function(){
+  return gulp.src('./src/static/**/*.*')
+  .pipe(gulp.dest('./dist/'));
+});
 
 // Handlebars
 gulp.task('hbs', function () {
@@ -24,10 +37,9 @@ gulp.task('hbs', function () {
     }
 
     return gulp.src('./src/views/index.hbs')
-        .pipe(handlebars(templateData, options))
-        .pipe(rename('index.html'))
-        .pipe(gulp.dest('dist'))
-        .pipe(livereload())
+      .pipe(handlebars(templateData, options))
+      .pipe(rename('index.html'))
+      .pipe(gulp.dest('dist'))
 });
 
 //Babel
@@ -45,27 +57,25 @@ gulp.task('less', function() {
     return gulp.src('./src/less/styles.less')
       .pipe(plumber())
       .pipe(less({ paths: ['./src/less'] }))
+      .pipe(cssmin())
+      .pipe(rename({suffix: '.min'}))
       .pipe(gulp.dest('./dist/css'))
-      .pipe(livereload())
-});
-
-// Cssmin
-gulp.task('cssmin', function () {
-    gulp.src('./dist/css/*.css')
-        .pipe(cssmin())
-        .pipe(rename({suffix: '.min'}))
-        .pipe(gulp.dest('./dist/css'));
 });
 
 // +++
 // Watch
 gulp.task('watch', function() {
     gulp.watch(['./src/**/*.hbs'], ['hbs']);
-    gulp.watch(['./src/**/*.less'], ['less', 'cssmin']);
+    gulp.watch(['./src/**/*.less'], ['less']);
     gulp.watch(['./src/**/*.js'], ['babel']);
 });
 
 // +++
-// Default & Build
-gulp.task('build', ['less', 'cssmin', 'hbs', 'babel']);
-gulp.task('default', ['watch']); // Default will run the 'entry' watch task
+// Default & Clean + Build
+gulp.task('build', function(done) {
+    runSequence('clean', 'runbuild', function() {
+      done();
+    });
+});
+gulp.task('runbuild', ['copy', 'less', 'hbs', 'babel']);
+gulp.task('default', ['watch']);
