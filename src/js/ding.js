@@ -1,10 +1,13 @@
 const obj = {
 
-  flap: function() {
-    console.log('fuck holes')
-  },
+  arr: ['1 personal space', '2 personal space', '3 personal space'],
 
-  arr: ['fuck', 'me', 'dry', 'please', 'thanks']
+  test: function() {
+    console.log('testing es6 [const, for-of] using node commonJS format via webpack...');
+    for (let value of this.arr) {
+      console.log(value)
+    }
+  }
 
 }
 

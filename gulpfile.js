@@ -28,7 +28,7 @@ gulp.task('copy', function(){
 gulp.task('hbs', function () {
     var templateData = { testy: 'this is the body' },
     options = {
-        ignorePartials: true,
+        ignorePartials: false,
         batch : ['./src/views/partials'],
         helpers : {
             capitals : function(str){

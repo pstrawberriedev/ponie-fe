@@ -1,8 +1,13 @@
+// Sanity Check
 const ding = require('./ding');
+ding.test();
 
-console.log('imported dings into index');
-ding.flap();
-
-for (let value of ding.arr) {
-  console.log(value)
-}
+// Actual Code
+const Masonry = require('masonry-layout'); //init in HTML
+const grid = document.querySelector('.news-grid');
+let masonry = new Masonry( grid, {
+  //itemSelector: '.news-item',
+  //columnWidth: 15
+  columnWidth:80
+  percentPosition: true
+});
