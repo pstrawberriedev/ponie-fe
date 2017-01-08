@@ -101,11 +101,14 @@ gulp.task('watch', function() {
 
 // +++
 // Default & Clean + Build
+// - define runbuild, which executes after 'build' via runSequence library
+// -- this is because we want to make sure we delete ./dist before we make
+//    a new build - to ensure everything is frash and claen
+gulp.task('runbuild', ['copy', 'less', 'hbs', 'babeldebug']);
 gulp.task('build', function(done) {
     runSequence('clean', 'runbuild', function() {
       done();
     });
 });
 //gulp.task('runbuild', ['copy', 'less', 'hbs', 'babel']);
-gulp.task('runbuild', ['copy', 'less', 'hbs', 'babeldebug']);
 gulp.task('default', ['watch']);
