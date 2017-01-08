@@ -48,7 +48,7 @@ gulp.task('hbs', function () {
       .pipe(liveReload())
 });
 
-//Babel
+// Babel
 gulp.task('babel', function() {
     return gulp.src('./src/js/*.js')
       .pipe(plumber(function (error) {
@@ -59,6 +59,19 @@ gulp.task('babel', function() {
       .pipe(concat('app.js'))
       .pipe(uglify())
       .pipe(rename({suffix: '.min'}))
+      .pipe(gulp.dest('./dist/js'))
+      .pipe(liveReload())
+});
+
+// Babel debug
+gulp.task('babeldebug', function() {
+    return gulp.src('./src/js/*.js')
+      .pipe(plumber(function (error) {
+        console.log(error.message);
+        this.emit('end');
+      }))
+      .pipe(babel({ presets: ['es2015'] }))
+      .pipe(concat('app.js'))
       .pipe(gulp.dest('./dist/js'))
       .pipe(liveReload())
 });
@@ -93,5 +106,6 @@ gulp.task('build', function(done) {
       done();
     });
 });
-gulp.task('runbuild', ['copy', 'less', 'hbs', 'babel']);
+//gulp.task('runbuild', ['copy', 'less', 'hbs', 'babel']);
+gulp.task('runbuild', ['copy', 'less', 'hbs', 'babeldebug']);
 gulp.task('default', ['watch']);
