@@ -1,16 +1,14 @@
 var gulp = require('gulp');
 var watch = require('gulp-watch');
 var clean = require('gulp-clean');
-var babel = require('gulp-babel');
+var webpack = require('webpack-stream');
 var less = require('gulp-less');
 var cssmin = require('gulp-cssmin');
 var handlebars = require('gulp-compile-handlebars');
-var uglify = require('gulp-uglify');
 var plumber = require('gulp-plumber');
-var concat = require('gulp-concat');
 var rename = require('gulp-rename');
 var runSequence = require('run-sequence');
-var liveReload = require('gulp-livereload');
+var liveReload = require('gulp-livereload'); //implement this, currently unused
 
 // Clean
 gulp.task('clean', function(){
@@ -25,6 +23,8 @@ gulp.task('copy', function(){
 });
 
 // Handlebars
+//  @todo: Redo this. Need more dynamic compiling and data-passthrough...
+//  should I handle this via express?
 gulp.task('hbs', function () {
     var templateData = { testy: 'this is the body' },
     options = {
@@ -48,32 +48,20 @@ gulp.task('hbs', function () {
       .pipe(liveReload())
 });
 
-// Babel
-gulp.task('babel', function() {
-    return gulp.src('./src/js/*.js')
-      .pipe(plumber(function (error) {
-        console.log(error.message);
-        this.emit('end');
-      }))
-      .pipe(babel({ presets: ['es2015'] }))
-      .pipe(concat('app.js'))
-      .pipe(uglify())
-      .pipe(rename({suffix: '.min'}))
-      .pipe(gulp.dest('./dist/js'))
-      .pipe(liveReload())
-});
-
-// Babel debug
-gulp.task('babeldebug', function() {
-    return gulp.src('./src/js/*.js')
-      .pipe(plumber(function (error) {
-        console.log(error.message);
-        this.emit('end');
-      }))
-      .pipe(babel({ presets: ['es2015'] }))
-      .pipe(concat('app.js'))
-      .pipe(gulp.dest('./dist/js'))
-      .pipe(liveReload())
+// Webpack
+// @todo: minify webpack output
+gulp.task('webpack', function() {
+  return gulp.src('./src/js/main.js')
+    .pipe(plumber(function (error) {
+      console.log(error.message);
+      this.emit('end');
+    }))
+    .pipe(webpack({
+      watch: false,
+      entry: { main: './src/js/main.js', },
+      output: { filename: './app.js' }
+    }))
+    .pipe(gulp.dest('./dist/js/'));
 });
 
 // Less
@@ -96,7 +84,7 @@ gulp.task('watch', function() {
     //liveReload.listen();
     gulp.watch(['./src/**/*.hbs'], ['hbs']);
     gulp.watch(['./src/**/*.less'], ['less']);
-    gulp.watch(['./src/**/*.js'], ['babel']);
+    gulp.watch(['./src/**/*.js'], ['webpack']);
 });
 
 // +++
@@ -104,11 +92,10 @@ gulp.task('watch', function() {
 // - define runbuild, which executes after 'build' via runSequence library
 // -- this is because we want to make sure we delete ./dist before we make
 //    a new build - to ensure everything is frash and claen
-gulp.task('runbuild', ['copy', 'less', 'hbs', 'babeldebug']);
 gulp.task('build', function(done) {
     runSequence('clean', 'runbuild', function() {
       done();
     });
 });
-//gulp.task('runbuild', ['copy', 'less', 'hbs', 'babel']);
+gulp.task('runbuild', ['copy', 'less', 'hbs', 'webpack']);
 gulp.task('default', ['watch']);
