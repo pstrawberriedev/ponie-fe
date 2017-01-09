@@ -1,0 +1,45 @@
+<div class="app">
+
+  <section class="app-title">
+    <div class="inline-block">
+      <h1>News Feed</h1>
+      <select name="app-sources">
+        <option value="all">All Sources</option>
+        <option value="ponie">Ponie Club</option>
+        <option value="wetfish">Wetfish</option>
+      </select>
+      <select name="app-filters">
+        <option value="new">Newest</option>
+        <option value="old">Oldest</option>
+        <option value="mostPop">Most Popular</option>
+        <option value="leastPop">Least Popular</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="masonry-grid">
+
+    {{#each posts}}
+      <a class="grid-item" href="{{this.link}}">
+        <hr />
+        <h2>{{this.title}}</h2>
+        <img class="source-icon" src="{{sourceIcon this.source}}" />
+        <div class="meta">
+          <div>
+            <span class="icon-man"></span>
+            {{this.author}} @ {{this.source}}
+          </div>
+          <div>
+            <span class="icon-clock"></span>
+            {{this.publishDate}}
+          </div>
+        </div>
+        {{#with this.image}}
+          <image class="image" src="{{this}}" />
+        {{/with}}
+      </a>
+    {{/each}}
+
+  </section>
+
+</div>

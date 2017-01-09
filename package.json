@@ -4,15 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "gulp"
+    "start": "nodemon ./src/server/server.js",
+    "production": "gulp server",
+    "build": "gulp build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["Ponie Club", "API", "Express", "ES6", "Webpack", "Babel", "Gulp"],
+  "author": "pstrawberriedev",
+  "license": "MIT",
   "dependencies": {
+    "express": "^4.14.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.21.0",
+    "babel-loader": "^6.2.10",
+    "babel-preset-es2015": "^6.18.0",
     "gulp": "^3.9.1",
     "gulp-clean": "^0.3.2",
-    "gulp-compile-handlebars": "^0.6.1",
     "gulp-cssmin": "^0.1.7",
     "gulp-less": "^3.3.0",
     "gulp-livereload": "^3.8.1",
@@ -21,6 +28,8 @@
     "gulp-watch": "^4.3.11",
     "masonry-layout": "^4.1.1",
     "run-sequence": "^1.2.2",
-    "webpack-stream": "^3.2.0"
+    "webpack": "^1.14.0",
+    "webpack-stream": "^3.2.0",
+    "wetfish-basic": "^0.7.11"
   }
 }

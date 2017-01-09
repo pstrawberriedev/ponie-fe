@@ -1,10 +1,10 @@
 var gulp = require('gulp');
 var watch = require('gulp-watch');
 var clean = require('gulp-clean');
-var webpack = require('webpack-stream');
+var gulpWebpack = require('webpack-stream');
+var webpack = require('webpack');
 var less = require('gulp-less');
 var cssmin = require('gulp-cssmin');
-var handlebars = require('gulp-compile-handlebars');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var runSequence = require('run-sequence');
@@ -17,64 +17,59 @@ gulp.task('clean', function(){
 });
 
 // Move Static Files
-gulp.task('copy', function(){
-  return gulp.src('./src/static/**/*.*')
+gulp.task('copystatic', function(){
+  return gulp.src('./src/public/static/**/*.*')
+  .pipe(gulp.dest('./dist/public'));
+});
+gulp.task('copyserver', function() {
+  return gulp.src('./src/server/**/*.*')
   .pipe(gulp.dest('./dist/'));
 });
 
-// Handlebars
-//  @todo: Redo this. Need more dynamic compiling and data-passthrough...
-//  should I handle this via express?
-gulp.task('hbs', function () {
-    var templateData = { testy: 'this is the body' },
-    options = {
-        ignorePartials: false,
-        batch : ['./src/views/partials'],
-        helpers : {
-            capitals : function(str){
-                return str.toUpperCase();
-            }
-        }
-    }
-
-    return gulp.src('./src/views/index.hbs')
-      .pipe(plumber(function (error) {
-        console.log(error.message);
-        this.emit('end');
-      }))
-      .pipe(handlebars(templateData, options))
-      .pipe(rename('index.html'))
-      .pipe(gulp.dest('dist'))
-      .pipe(liveReload())
-});
-
 // Webpack
-// @todo: minify webpack output
+// using 'webpack-stream' for gulp stream, 'webpack' for plugins & loaders
 gulp.task('webpack', function() {
-  return gulp.src('./src/js/main.js')
+  gulp.src('./src/public/js/main.js')
     .pipe(plumber(function (error) {
       console.log(error.message);
       this.emit('end');
     }))
-    .pipe(webpack({
+    .pipe(gulpWebpack({
       watch: false,
-      entry: { main: './src/js/main.js', },
-      output: { filename: './app.js' }
-    }))
-    .pipe(gulp.dest('./dist/js/'));
+      entry: { main: './src/public/js/main.js', },
+      output: { filename: './app.js' },
+      module: {
+        loaders: [{
+          test: /\.js$/,
+          exclude: /(node_modules|bower_components)/,
+          loader: 'babel-loader',
+          query: {
+            presets: ['es2015']
+          }
+        }]
+      },
+      plugins: [new webpack.optimize.UglifyJsPlugin({
+        comments: false,
+        compress: {
+          warnings: false
+        }
+      })]
+    }, webpack))
+    .pipe(rename({suffix: '.min'}))
+    .pipe(gulp.dest('./dist/public/js/'));
 });
 
 // Less
 gulp.task('less', function() {
-    return gulp.src('./src/less/styles.less')
+    return gulp.src('./src/public/less/styles.less')
        .pipe(plumber(function (error) {
          console.log(error.message);
          this.emit('end');
        }))
-      .pipe(less({ paths: ['./src/less'] }))
+      .pipe(less({ paths: ['./src/public/less'] }))
       .pipe(cssmin())
       .pipe(rename({suffix: '.min'}))
-      .pipe(gulp.dest('./dist/css'))
+      .pipe(gulp.dest('./dist/public/css'))
       .pipe(liveReload())
 });
 
@@ -82,20 +77,19 @@ gulp.task('less', function() {
 // Watch
 gulp.task('watch', function() {
     //liveReload.listen();
-    gulp.watch(['./src/**/*.hbs'], ['hbs']);
-    gulp.watch(['./src/**/*.less'], ['less']);
-    gulp.watch(['./src/**/*.js'], ['webpack']);
+    gulp.watch(['./src/public/**/*.less'], ['less']);
+    gulp.watch(['./src/public/**/*.js'], ['webpack']);
 });
 
 // +++
-// Default & Clean + Build
-// - define runbuild, which executes after 'build' via runSequence library
-// -- this is because we want to make sure we delete ./dist before we make
-//    a new build - to ensure everything is frash and claen
+// Build & Default tasks
+// - Define 'runbuild', which executes after 'build' via runSequence library.
+//   This is because we want to make sure we delete ./dist/* before we
+//   make a new build (to ensure everything is ~ frash and claen ~)
+gulp.task('runbuild', ['copystatic', 'copyserver', 'less', 'webpack']);
 gulp.task('build', function(done) {
     runSequence('clean', 'runbuild', function() {
       done();
     });
 });
-gulp.task('runbuild', ['copy', 'less', 'hbs', 'webpack']);
-gulp.task('default', ['watch']);
+gulp.task('default', ['build']);
